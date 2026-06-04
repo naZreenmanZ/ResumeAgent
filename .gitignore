@@ -1,0 +1,37 @@
+.DS_Store
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local secrets and personal config
+.env
+.env.*
+config.toml
+*.local.toml
+
+# Runtime state and generated application artifacts
+*.sqlite3
+*.db
+generated/
+tailored_resumes/*
+!tailored_resumes/.gitkeep
+tracking/*
+!tracking/.gitkeep
+
+# Personal resumes and application data
+resumes/base_resume.md
+resumes/*
+!resumes/.gitkeep
+!resumes/README.md
+resumes/*.pdf
+resumes/*.doc
+resumes/*.docx
+resumes/private/
+imports/*.csv
+imports/*.json
+
+# Playwright/browser artifacts
+playwright-report/
+test-results/

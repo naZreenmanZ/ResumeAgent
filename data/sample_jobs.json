@@ -1,0 +1,22 @@
+[
+  {
+    "portal": "demo",
+    "portal_id": "demo-001",
+    "title": "Backend Python Engineer",
+    "company": "Atlas Workflow Labs",
+    "location": "Remote",
+    "url": "https://example.com/jobs/demo-001",
+    "description": "Build Python services, API integrations, SQL-backed automation, and internal workflow tools.",
+    "requirements": ["Python", "SQL", "REST APIs", "automation", "testing"]
+  },
+  {
+    "portal": "demo",
+    "portal_id": "demo-002",
+    "title": "Sales Representative",
+    "company": "Bright Commission Group",
+    "location": "Dubai",
+    "url": "https://example.com/jobs/demo-002",
+    "description": "Commission only sales role with outbound calling.",
+    "requirements": ["sales", "cold calling"]
+  }
+]

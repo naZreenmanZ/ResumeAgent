@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+set -eu
+
+PROJECT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+exec python3 -m jobapply --config "$PROJECT_DIR/config.toml" "$@"

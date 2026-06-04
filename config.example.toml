@@ -1,0 +1,107 @@
+database_path = "jobapply.sqlite3"
+base_resume_dir = "resumes"
+base_resume_path = "resumes/base_resume.md"
+mena_resume_path = "resumes/base_resume.md"
+non_mena_resume_path = "resumes/base_resume.md"
+tailored_resume_dir = "tailored_resumes"
+tracking_dir = "tracking"
+
+[profile]
+target_titles = ["Software Engineer", "Backend Engineer", "AI Engineer"]
+target_locations = ["Remote", "Dubai", "United Arab Emirates"]
+required_keywords = ["Python", "automation", "API", "SQL"]
+blocked_keywords = ["unpaid", "commission only"]
+
+[[portals]]
+name = "demo"
+enabled = true
+type = "demo_json"
+path = "data/sample_jobs.json"
+
+[[portals]]
+name = "linkedin"
+enabled = false
+type = "saved_search_import"
+path = "imports/linkedin.csv"
+method = "saved-search export/import"
+notes = "Paste or export LinkedIn jobs into this CSV."
+
+[[portals]]
+name = "linkedin-browser"
+enabled = false
+type = "browser_agent"
+method = "browser scan with configured selectors"
+search_url = "https://www.linkedin.com/jobs/search/?keywords=Python%20Engineer&location=Dubai"
+base_url = "https://www.linkedin.com"
+job_card_selector = ""
+title_selector = ""
+company_selector = ""
+location_selector = ""
+url_selector = ""
+headless = false
+max_jobs = 25
+
+[[portals]]
+name = "gulftalent-browser"
+enabled = false
+type = "browser_agent"
+method = "browser scan with configured selectors"
+search_url = "https://www.gulftalent.com/jobs/category/software"
+base_url = "https://www.gulftalent.com"
+job_card_selector = "main table tbody tr:has(h2 a)"
+title_selector = "h2 a"
+company_selector = "td:first-child > a"
+location_selector = "td:nth-child(2) a"
+url_selector = "h2 a"
+headless = true
+max_jobs = 25
+fetch_detail_descriptions = true
+detail_description_selector = "main"
+
+[[portals]]
+name = "indeed"
+enabled = false
+type = "saved_search_import"
+path = "imports/indeed.csv"
+method = "saved-search export/import"
+notes = "Paste or export Indeed jobs into this CSV."
+
+[[portals]]
+name = "gulftalent"
+enabled = false
+type = "saved_search_import"
+path = "imports/gulftalent.csv"
+method = "saved-search export/import"
+notes = "Paste or export GulfTalent jobs into this CSV."
+
+[[portals]]
+name = "naukrigulf"
+enabled = false
+type = "saved_search_import"
+path = "imports/naukrigulf.csv"
+method = "saved-search export/import"
+notes = "Paste or export NaukriGulf jobs into this CSV."
+
+[[portals]]
+name = "bayt"
+enabled = false
+type = "saved_search_import"
+path = "imports/bayt.csv"
+method = "saved-search export/import"
+notes = "Paste or export Bayt jobs into this CSV."
+
+[[portals]]
+name = "wellfound"
+enabled = false
+type = "saved_search_import"
+path = "imports/wellfound.csv"
+method = "saved-search export/import"
+notes = "Paste or export Wellfound jobs into this CSV."
+
+[[portals]]
+name = "jobtogether"
+enabled = false
+type = "saved_search_import"
+path = "imports/jobtogether.csv"
+method = "saved-search export/import"
+notes = "Paste or export JobTogether jobs into this CSV."
