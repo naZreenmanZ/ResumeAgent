@@ -198,14 +198,36 @@ def strip_bullet(value: str) -> str:
 
 
 def build_targeted_summary(job: Row, keywords: list[str]) -> str:
-    focus = ", ".join(keywords[:5]) if keywords else "backend engineering and product delivery"
+    role = str(job["title"]).strip() or "software engineering"
+    focus_terms = polished_focus_terms(keywords)
+    focus = ", ".join(focus_terms[:5]) if focus_terms else "backend engineering and product delivery"
     return (
-        "Full Stack Engineer with 5+ years of experience building scalable, secure, cloud-native "
-        f"web applications, with strong alignment to {focus}. Experienced across React, "
-        "TypeScript, Node.js, Python, REST APIs, AWS, database optimization, and production "
-        "performance improvements, with a track record of collaborating across product, design, "
-        "business, and engineering teams."
+        f"Full Stack Engineer with 5+ years of experience building production web applications and "
+        f"backend services relevant to {role} roles. Strong experience across {focus}, with hands-on "
+        "delivery using React, TypeScript, Node.js, Python, REST APIs, AWS, database optimization, "
+        "automation, and production performance improvements. Known for collaborating with product, "
+        "design, business, and engineering teams to ship reliable, user-focused systems."
     )
+
+
+def polished_focus_terms(keywords: list[str]) -> list[str]:
+    replacements = {
+        "backend": "backend development",
+        "APIs": "API design",
+        "database": "database-backed systems",
+        "scalable": "scalable architecture",
+        "secure": "secure application design",
+        "performance": "performance optimization",
+        "third-party": "third-party integrations",
+        "communication": "cross-functional communication",
+        "automation": "workflow automation",
+    }
+    terms: list[str] = []
+    for keyword in keywords:
+        term = replacements.get(keyword, keyword)
+        if normalize_text(term) not in {normalize_text(existing) for existing in terms}:
+            terms.append(term)
+    return terms
 
 
 def tailor_resume(base_resume_path: Path, output_dir: Path, job: Row) -> Path:
@@ -227,7 +249,6 @@ def tailor_resume(base_resume_path: Path, output_dir: Path, job: Row) -> Path:
         f"JD signals: {jd_snapshot or 'No detailed JD text captured yet.'}\n"
         "-->\n\n"
         f"# {profile['name']}\n\n"
-        f"{profile['headline']}\n\n"
         f"{profile['contact']}\n\n"
         "## Professional Summary\n\n"
         f"{build_targeted_summary(job, keywords)}\n\n"
@@ -238,7 +259,7 @@ def tailor_resume(base_resume_path: Path, output_dir: Path, job: Row) -> Path:
         "## Certifications & Achievements\n\n"
         f"{format_lines(profile['certifications'])}\n\n"
         "## Education\n\n"
-        f"{format_lines(profile['education'])}\n\n"
+        f"{format_lines(clean_education(profile['education']))}\n\n"
         "## Languages\n\n"
         f"{format_lines(profile['languages'])}\n"
     )
@@ -252,14 +273,12 @@ def parse_resume_profile(base_resume: str) -> dict[str, object]:
     compact_lines = [clean_line(line) for line in normalized_resume.splitlines()]
     compact_lines = [line for line in compact_lines if line]
     name = first_nonempty(compact_lines, "NASREEN MANZOOR")
-    headline = next((line for line in compact_lines[1:5] if "Engineer" in line), "Full Stack Engineer")
     contact = next(
         (line for line in compact_lines[:8] if "@" in line or "+971" in line),
         "Dubai, United Arab Emirates | nazreenmanz@gmail.com | +971 555239823",
     )
     return {
         "name": name,
-        "headline": headline,
         "contact": contact,
         "skills": extract_technical_skills(normalized_resume),
         "experience": extract_professional_experience(normalized_resume),
@@ -473,6 +492,7 @@ def format_skills(base_skills: list[str], keywords: list[str]) -> str:
 
 def format_skills_by_category(base_skills: list[str], keywords: list[str]) -> str:
     categories = parse_skill_categories(base_skills)
+    categories = {category: clean_skill_values(values) for category, values in categories.items()}
     keyword_categories = {
         "Backend": ["Python", "backend", "APIs", "database", "third-party", "automation", "SQL"],
         "Frontend": ["full-stack", "React", "TypeScript"],
@@ -485,7 +505,7 @@ def format_skills_by_category(base_skills: list[str], keywords: list[str]) -> st
         existing = categories.setdefault(category, [])
         for keyword in keywords:
             if normalize_text(keyword) in {normalize_text(term) for term in terms}:
-                add_unique(existing, keyword)
+                add_unique(existing, skill_label(keyword))
 
     ordered_categories = [
         "Backend",
@@ -514,6 +534,31 @@ def parse_skill_categories(base_skills: list[str]) -> dict[str, list[str]]:
     return categories
 
 
+def clean_skill_values(values: list[str]) -> list[str]:
+    cleaned: list[str] = []
+    for value in values:
+        label = skill_label(value)
+        if normalize_text(label) not in {normalize_text(existing) for existing in cleaned}:
+            cleaned.append(label)
+    return cleaned
+
+
+def skill_label(value: str) -> str:
+    replacements = {
+        "database": "Database Optimization",
+        "APIs": "API Design",
+        "backend": "Backend Development",
+        "secure": "Secure Application Design",
+        "scalable": "Scalable System Design",
+        "third-party": "Third-party Integrations",
+        "performance": "Performance Optimization",
+        "communication": "Cross-functional Communication",
+        "automation": "Workflow Automation",
+        "AI": "AI-assisted Development",
+    }
+    return replacements.get(value, value)
+
+
 def add_unique(values: list[str], value: str) -> None:
     normalized = normalize_text(value)
     if normalized and normalized not in {normalize_text(item) for item in values}:
@@ -526,9 +571,18 @@ def format_experience(experience: list[dict[str, object]]) -> str:
     blocks: list[str] = []
     for job in experience:
         heading = str(job["heading"])
-        bullets = [as_bullet(str(bullet)) for bullet in job["bullets"]]
+        bullets = [as_bullet(clean_resume_bullet(str(bullet))) for bullet in job["bullets"]]
         blocks.append("\n".join([f"### {heading}", *bullets]))
     return "\n\n".join(blocks)
+
+
+def clean_resume_bullet(value: str) -> str:
+    cleaned = clean_line(value)
+    cleaned = cleaned.replace("8 months ,", "8 months,")
+    cleaned = cleaned.replace("■", ";").replace("○", ";")
+    cleaned = re.sub(r"\s*;\s*", "; ", cleaned)
+    cleaned = cleaned.replace("of:; ", "of: ")
+    return cleaned
 
 
 def format_lines(lines: list[str]) -> str:
@@ -539,3 +593,34 @@ def format_lines(lines: list[str]) -> str:
         if line.strip() and normalize_text(line) not in {"languages", "education", "certifications"}
     ]
     return "\n".join(as_bullet(line) for line in filtered) if filtered else "- Available on request"
+
+
+def clean_education(lines: list[str]) -> list[str]:
+    text = " ".join(clean_line(line) for line in lines if clean_line(line))
+    if not text:
+        return []
+
+    education: list[str] = []
+    master = re.search(
+        r"(Master of Computer Applications \(MCA\)).*?(APJ Abdul Kalam University).*?(2018\s*[–-]\s*2021).*?CGPA:\s*([0-9.]+)",
+        text,
+        flags=re.IGNORECASE,
+    )
+    bachelor = re.search(
+        r"(Bachelor of Computer Applications \(BCA\)).*?(Calicut University).*?(2015\s*[–-]\s*2018).*?CGPA:\s*([0-9.]+)",
+        text,
+        flags=re.IGNORECASE,
+    )
+    if master:
+        education.append(
+            f"{master.group(1)} — {master.group(2)} | {normalize_dash(master.group(3))} | CGPA: {master.group(4)}"
+        )
+    if bachelor:
+        education.append(
+            f"{bachelor.group(1)} — {bachelor.group(2)} | {normalize_dash(bachelor.group(3))} | CGPA: {bachelor.group(4)}"
+        )
+    return education or lines
+
+
+def normalize_dash(value: str) -> str:
+    return re.sub(r"\s*[–-]\s*", " – ", value.strip())

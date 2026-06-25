@@ -10,7 +10,7 @@ def export_tailored_pdf(markdown_path: Path) -> Path:
         from reportlab.lib.pagesizes import A4
         from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
         from reportlab.lib.units import mm
-        from reportlab.platypus import ListFlowable, ListItem, Paragraph, SimpleDocTemplate, Spacer
+        from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
     except ImportError as exc:
         raise RuntimeError("PDF export requires reportlab. Install with: python3 -m pip install reportlab") from exc
 
@@ -98,10 +98,10 @@ def export_tailored_pdf(markdown_path: Path) -> Path:
         if section_name == "Professional Experience":
             render_experience_lines(story, lines, body, bullet, Paragraph)
         elif section_name in {"Education", "Certifications & Achievements", "Languages"}:
-            story.append(make_bullets(lines, bullet, ListFlowable, ListItem, Paragraph))
+            render_bullet_lines(story, lines, bullet, Paragraph)
         elif section_name == "Technical Skills":
             for line in lines:
-                story.append(Paragraph(markdown_bold_to_reportlab(escape(strip_bullet(line))), bullet, bulletText="•"))
+                story.append(Paragraph(markdown_bold_to_reportlab(escape(strip_bullet(line))), bullet, bulletText="-"))
         else:
             story.append(Paragraph(escape(" ".join(lines)), body))
         story.append(Spacer(1, 3))
@@ -179,13 +179,10 @@ def split_skill_lines(lines: list[str]) -> list[str]:
     return skills
 
 
-def make_bullets(lines: list[str], style: object, list_flowable: object, list_item: object, paragraph: object) -> object:
-    items = [
-        list_item(paragraph(escape(strip_bullet(line)), style), leftIndent=8)
-        for line in lines
-        if strip_bullet(line)
-    ]
-    return list_flowable(items, bulletType="bullet", start="circle")
+def render_bullet_lines(story: list[object], lines: list[str], style: object, paragraph: object) -> None:
+    for line in lines:
+        if strip_bullet(line):
+            story.append(paragraph(escape(strip_bullet(line)), style, bulletText="-"))
 
 
 def render_experience_lines(story: list[object], lines: list[str], body: object, bullet: object, paragraph: object) -> None:
@@ -193,7 +190,7 @@ def render_experience_lines(story: list[object], lines: list[str], body: object,
         if line.startswith("### "):
             story.append(paragraph(f"<b>{escape(line[4:].strip())}</b>", body))
         elif strip_bullet(line):
-            story.append(paragraph(escape(strip_bullet(line)), bullet, bulletText="•"))
+            story.append(paragraph(escape(strip_bullet(line)), bullet, bulletText="-"))
 
 
 def escape(value: str) -> str:

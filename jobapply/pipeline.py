@@ -28,10 +28,13 @@ def scan_enabled_portals(config: AppConfig, store: JobStore) -> dict[str, object
         try:
             jobs = adapter.scan()
         except PortalSetupRequired as exc:
-            stats["skipped_portals"] = int(stats["skipped_portals"]) + 1
-            warnings = stats["warnings"]
-            if isinstance(warnings, list):
-                warnings.append(str(exc))
+            record_portal_warning(stats, str(exc))
+            continue
+        except Exception as exc:
+            record_portal_warning(
+                stats,
+                f"{portal.name} scan failed ({type(exc).__name__}): {exc}",
+            )
             continue
 
         for job in jobs:
@@ -53,3 +56,10 @@ def scan_enabled_portals(config: AppConfig, store: JobStore) -> dict[str, object
                 stats["inserted"] = int(stats["inserted"]) + 1
 
     return stats
+
+
+def record_portal_warning(stats: dict[str, object], message: str) -> None:
+    stats["skipped_portals"] = int(stats["skipped_portals"]) + 1
+    warnings = stats["warnings"]
+    if isinstance(warnings, list):
+        warnings.append(message)
