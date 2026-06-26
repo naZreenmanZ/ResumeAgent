@@ -2,6 +2,8 @@
 
 Type: AFK
 
+Status: Done
+
 Blocked by: None - can start immediately
 
 User stories covered: 10, 24, 30, 34, 35, 36
@@ -14,10 +16,17 @@ The shell should run locally and make the product feel like a real workspace ins
 
 ## Acceptance criteria
 
-- [ ] A local frontend app can be started from the project.
-- [ ] The app has routes or views for Dashboard, Job Queue, Resume Review, Application Flow, Tracker, Portals, and Settings.
-- [ ] Navigation clearly shows the current section.
-- [ ] Styling follows the Premium Career Command Center direction: warm off-white background, white surfaces, navy/deep teal accent, refined but operational layout.
-- [ ] Empty states exist for views that do not yet have backend data.
-- [ ] No personal resume content or tracker data is hardcoded into the frontend.
-- [ ] Basic accessibility is present: keyboard navigation, visible focus states, readable contrast, and semantic page headings.
+- [x] A local frontend app can be started from the project.
+- [x] The app has routes or views for Dashboard, Job Queue, Resume Review, Application Flow, Tracker, Portals, and Settings.
+- [x] Navigation clearly shows the current section.
+- [x] Styling follows the Premium Career Command Center direction: warm off-white background, white surfaces, navy/deep teal accent, refined but operational layout.
+- [x] Empty states exist for views that do not yet have backend data.
+- [x] No personal resume content or tracker data is hardcoded into the frontend.
+- [x] Basic accessibility is present: keyboard navigation, visible focus states, readable contrast, and semantic page headings.
+
+## Completion notes
+
+- Implemented the local Next.js web shell in `apps/web`.
+- Added persistent navigation and placeholder views for all required sections.
+- Verified production build and browser route checks.
+- No backend integration was added in this issue.

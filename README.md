@@ -18,6 +18,29 @@ python3 -m jobapply init
 
 `./bin/jobapply` is the executable wrapper for this project. You can still use `python3 -m jobapply --config config.toml ...` if you prefer.
 
+## Local Web Shell
+
+The first ResumeAgent web shell lives in `apps/web`. It is currently a local UI shell with placeholder views only; backend data integration starts in a later issue.
+
+```bash
+cd apps/web
+npm install
+npm run dev
+```
+
+Then open `http://localhost:3000`.
+
+## Local API
+
+The local API wraps the existing Python engine so the web UI can call scan, queue, tailor, export, plan, tracker, and settings operations without shelling out.
+
+```bash
+python3 -m pip install fastapi uvicorn httpx
+python3 -m uvicorn jobapply.api:app --reload --port 8000
+```
+
+Then open `http://localhost:8000/docs`.
+
 ## Personal Setup
 
 Keep personal files out of git. This repo ignores local config, generated resumes, SQLite state, PDF/DOCX resumes, and portal import files.

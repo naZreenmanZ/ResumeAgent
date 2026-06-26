@@ -4,6 +4,12 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+node_modules/
+.next/
+out/
+dist/
+coverage/
+npm-debug.log*
 
 # Local secrets and personal config
 .env

@@ -4,12 +4,13 @@ import argparse
 from pathlib import Path
 from time import sleep
 
-from .application_agent import build_application_plan, write_application_plan
+from .application_agent import build_application_plan
 from .config import init_project, load_config
 from .db import JobStore
 from .pdf_export import export_tailored_pdf
 from .pipeline import scan_enabled_portals
 from .resume import select_resume_path, tailor_resume
+from .services import prepare_application_assets
 from .tracker import export_application_tracker
 
 
@@ -307,24 +308,6 @@ def command_export_tracker(config_path: str) -> None:
         print(xlsx_path)
     finally:
         store.close()
-
-
-def prepare_application_assets(
-    config,
-    store: JobStore,
-    fingerprint: str,
-    mode: str,
-) -> tuple[Path, Path, Path]:
-    job = store.get_job(fingerprint)
-    if job is None:
-        raise SystemExit(f"No job found: {fingerprint}")
-    source_resume_path = select_resume_path(config, job)
-    resume_path = tailor_resume(source_resume_path, config.tailored_resume_dir, job)
-    upload_resume_path = export_tailored_pdf(resume_path)
-    store.set_job_status(fingerprint, "tailored")
-    plan = build_application_plan(job, resume_path, upload_resume_path, mode)
-    plan_path = write_application_plan(plan, config.tailored_resume_dir)
-    return resume_path, upload_resume_path, plan_path
 
 
 def ensure_runtime_dirs(config) -> None:
